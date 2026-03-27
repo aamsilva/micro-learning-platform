@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Micro Learning Platform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-user">
+            <img src="https://ui-avatars.com/api/?name=User" alt="User" id="userAvatar">
+            <h3 id="userName">Loading...</h3>
+            <p id="userRole">Student</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#" class="active" data-section="overview">
+                <i class="fas fa-home"></i> Overview
+            </a>
+            <a href="#" data-section="courses">
+                <i class="fas fa-book"></i> My Courses
+            </a>
+            <a href="#" data-section="progress">
+                <i class="fas fa-chart-line"></i> Progress
+            </a>
+            <a href="#" data-section="certificates">
+                <i class="fas fa-certificate"></i> Certificates
+            </a>
+            <a href="#" data-section="achievements">
+                <i class="fas fa-trophy"></i> Achievements
+            </a>
+            <a href="{{ url_for('analytics_page') }}">
+                <i class="fas fa-analytics"></i> Analytics
+            </a>
+        </nav>
+    </aside>
+    
+    <!-- Main Content -->
+    <div class="dashboard-content">
+        <!-- Overview Section -->
+        <section id="overview" class="dashboard-section active">
+            <div class="section-header">
+                <h1>Welcome back!</h1>
+                <p>Continue where you left off</p>
+            </div>
+            
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-book-open"></i></div>
+                    <div class="stat-info">
+                        <h3 id="enrolledCount">0</h3>
+                        <p>Enrolled Courses</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <h3 id="completedCount">0</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-fire"></i></div>
+                    <div class="stat-info">
+                        <h3 id="streakCount">0</h3>
+                        <p>Day Streak</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-info">
+                        <h3 id="timeSpent">0h</h3>
+                        <p>Learning Time</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Courses In Progress -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>Continue Learning</h2>
+                    <a href="#" data-section="courses">View All</a>
+                </div>
+                <div class="course-list" id="inProgressCourses">
+                    <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity -->
+            <div class="content-card">
+                <div class="card-header">
+                    <h2>Recent Activity</h2>
+                </div>
+                <div class="activity-list" id="recentActivity">
+                    <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- My Courses Section -->
+        <section id="courses" class="dashboard-section">
+            <div class="section-header">
+                <h1>My Courses</h1>
+                <p>Manage your enrolled courses</p>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" data-tab="in-progress">In Progress</button>
+                <button class="tab" data-tab="completed">Completed</button>
+                <button class="tab" data-tab="all">All Courses</button>
+            </div>
+            
+            <div class="tab-content">
+                <div id="in-progress" class="tab-pane active">
+                    <div class="course-grid" id="enrolledCourses">
+                        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                    </div>
+                </div>
+                <div id="completed" class="tab-pane">
+                    <div class="course-grid" id="completedCourses">
+                        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                    </div>
+                </div>
+                <div id="all" class="tab-pane">
+                    <div class="course-grid" id="allCourses">
+                        <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Progress Section -->
+        <section id="progress" class="dashboard-section">
+            <div class="section-header">
+                <h1>Learning Progress</h1>
+                <p>Track your learning journey</p>
+            </div>
+            
+            <div class="progress-overview">
+                <div class="progress-chart">
+                    <h3>Weekly Activity</h3>
+                    <div class="chart-bars" id="weeklyChart">
+                        <!-- Chart loaded via JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Certificates Section -->
+        <section id="certificates" class="dashboard-section">
+            <div class="section-header">
+                <h1>Certificates</h1>
+                <p>Your earned certificates</p>
+            </div>
+            
+            <div class="certificates-grid" id="certificatesList">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+            </div>
+        </section>
+        
+        <!-- Achievements Section -->
+        <section id="achievements" class="dashboard-section">
+            <div class="section-header">
+                <h1>Achievements</h1>
+                <p>Your accomplishments</p>
+            </div>
+            
+            <div class="achievements-grid" id="achievementsList">
+                <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const tokenKey = 'lms_access_token';
+let currentUser = null;
+
+// Check auth on load
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem(tokenKey);
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+    
+    currentUser = JSON.parse(localStorage.getItem('lms_user') || '{}');
+    loadDashboardData();
+    
+    // Setup navigation
+    setupNavigation();
+});
+
+function setupNavigation() {
+    const navLinks = document.querySelectorAll('.sidebar-nav a[data-section]');
+    const sections = document.querySelectorAll('.dashboard-section');
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const sectionId = this.dataset.section;
+            
+            // Update active states
+            navLinks.forEach(l => l.classList.remove('active'));
+            this.classList.add('active');
+            
+            sections.forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        });
+    });
+    
+    // Tab switching
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabId = this.dataset.tab;
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+}
+
+async function loadDashboardData() {
+    try {
+        const response = await fetch('/api/analytics/dashboard', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem(tokenKey)}`
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            updateDashboard(data.data);
+        } else {
+            showToast('Failed to load dashboard data', 'error');
+        }
+    } catch (error) {
+        console.error('Dashboard load error:', error);
+        showToast('Error loading dashboard', 'error');
+    }
+}
+
+function updateDashboard(data) {
+    // Update user info
+    if (data.user) {
+        document.getElementById('userName').textContent = data.user.full_name;
+        document.getElementById('userRole').textContent = data.user.role;
+        document.getElementById('userAvatar').src = data.user.avatar_url || 
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.full_name)}`;
+    }
+    
+    // Update stats
+    if (data.stats) {
+        document.getElementById('enrolledCount').textContent = data.stats.enrolled;
+        document.getElementById('completedCount').textContent = data.stats.completed;
+    }
+    
+    // Update streak
+    if (data.streak) {
+        document.getElementById('streakCount').textContent = data.streak.current_streak;
+    }
+    
+    // Update courses in progress
+    const coursesContainer = document.getElementById('inProgressCourses');
+    if (data.courses_in_progress && data.courses_in_progress.length > 0) {
+        coursesContainer.innerHTML = data.courses_in_progress.map(course => createProgressCard(course)).join('');
+    } else {
+        coursesContainer.innerHTML = '<p class="empty-state">No courses in progress. <a href="/courses">Browse courses</a></p>';
+    }
+    
+    // Update enrolled courses
+    updateEnrolledCourses(data.courses_in_progress || []);
+    
+    // Update certificates
+    const certsContainer = document.getElementById('certificatesList');
+    if (data.certificates && data.certificates.length > 0) {
+        certsContainer.innerHTML = data.certificates.map(cert => createCertificateCard(cert)).join('');
+    } else {
+        certsContainer.innerHTML = '<p class="empty-state">No certificates yet. Complete a course to earn one!</p>';
+    }
+    
+    // Update achievements
+    const achContainer = document.getElementById('achievementsList');
+    if (data.achievements && data.achievements.length > 0) {
+        achContainer.innerHTML = data.achievements.map(ach => createAchievementCard(ach)).join('');
+    } else {
+        achContainer.innerHTML = '<p class="empty-state">No achievements yet. Keep learning!</p>';
+    }
+}
+
+function updateEnrolledCourses(courses) {
+    const container = document.getElementById('enrolledCourses');
+    
+    if (courses.length > 0) {
+        container.innerHTML = courses.map(course => createCourseCard(course.course)).join('');
+    } else {
+        container.innerHTML = '<p class="empty-state">No courses in progress</p>';
+    }
+}
+
+function createCourseCard(course) {
+    const image = course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400';
+    
+    return `
+        <div class="course-card">
+            <div class="course-image">
+                <img src="${image}" alt="${course.title}">
+            </div>
+            <div class="course-content">
+                <h3><a href="/course/${course.id}">${course.title}</a></h3>
+                <p class="course-instructor">By ${course.instructor_name || 'Instructor'}</p>
+                <a href="/course/${course.id}" class="btn btn-sm">Continue</a>
+            </div>
+        </div>
+    `;
+}
+
+function createProgressCard(course) {
+    const image = course.course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400';
+    const progress = course.progress;
+    
+    return `
+        <div class="progress-card">
+            <img src="${image}" alt="${course.course.title}">
+            <div class="progress-info">
+                <h3>${course.course.title}</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${progress.percentage}%"></div>
+                </div>
+                <p>${progress.completed_lessons}/${progress.total_lessons} lessons (${progress.percentage}%)</p>
+            </div>
+            <a href="/course/${course.course.id}" class="btn btn-sm">Continue</a>
+        </div>
+    `;
+}
+
+function createCertificateCard(cert) {
+    return `
+        <div class="certificate-card">
+            <div class="certificate-icon">
+                <i class="fas fa-certificate"></i>
+            </div>
+            <div class="certificate-info">
+                <h3>${cert.course.title}</h3>
+                <p>Issued: ${new Date(cert.issued_at).toLocaleDateString()}</p>
+                <code>${cert.certificate_number}</code>
+            </div>
+            <button class="btn btn-sm" onclick="viewCertificate(${cert.id})">View</button>
+        </div>
+    `;
+}
+
+function createAchievementCard(achievement) {
+    return `
+        <div class="achievement-card">
+            <div class="achievement-icon">
+                <i class="fas fa-${achievement.icon || 'trophy'}"></i>
+            </div>
+            <h3>${achievement.name}</h3>
+            <p>${achievement.description}</p>
+        </div>
+    `;
+}
+</script>
+{% endblock %}

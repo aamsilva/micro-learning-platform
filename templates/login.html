@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Micro Learning Platform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1><i class="fas fa-graduation-cap"></i> Welcome Back</h1>
+                <p>Sign in to continue learning</p>
+            </div>
+            
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" required 
+                               placeholder="Enter your email">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" required 
+                               placeholder="Enter your password">
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+                
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-loading" style="display:none">
+                        <i class="fas fa-spinner fa-spin"></i> Signing in...
+                    </span>
+                </button>
+            </form>
+            
+            <div class="auth-divider">
+                <span>or continue with</span>
+            </div>
+            
+            <div class="social-auth">
+                <button type="button" class="btn btn-social">
+                    <i class="fab fa-google"></i> Google
+                </button>
+                <button type="button" class="btn btn-social">
+                    <i class="fab fa-github"></i> GitHub
+                </button>
+            </div>
+            
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="{{ url_for('register_page') }}">Sign up</a></p>
+            </div>
+        </div>
+        
+        <div class="auth-info">
+            <h2>Demo Accounts</h2>
+            <div class="demo-accounts">
+                <div class="demo-account" onclick="fillDemo('admin@lms.com', 'admin123')">
+                    <span class="role">Admin</span>
+                    <code>admin@lms.com / admin123</code>
+                </div>
+                <div class="demo-account" onclick="fillDemo('instructor@lms.com', 'instructor123')">
+                    <span class="role">Instructor</span>
+                    <code>instructor@lms.com / instructor123</code>
+                </div>
+                <div class="demo-account" onclick="fillDemo('student@lms.com', 'student123')">
+                    <span class="role">Student</span>
+                    <code>student@lms.com / student123</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const tokenKey = 'lms_access_token';
+
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const icon = document.querySelector('.toggle-password i');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function fillDemo(email, password) {
+    document.getElementById('email').value = email;
+    document.getElementById('password').value = password;
+    showToast('Demo credentials filled', 'info');
+}
+
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const btn = this.querySelector('button[type="submit"]');
+    const btnText = btn.querySelector('.btn-text');
+    const btnLoading = btn.querySelector('.btn-loading');
+    
+    btn.disabled = true;
+    btnText.style.display = 'none';
+    btnLoading.style.display = 'inline';
+    
+    const formData = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+    };
+    
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            localStorage.setItem(tokenKey, data.data.tokens.access_token);
+            localStorage.setItem('lms_refresh_token', data.data.tokens.refresh_token);
+            localStorage.setItem('lms_user', JSON.stringify(data.data.user));
+            
+            showToast('Login successful! Redirecting...', 'success');
+            
+            setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 1000);
+        } else {
+            showToast(data.error || 'Login failed', 'error');
+        }
+    } catch (error) {
+        showToast('Network error. Please try again.', 'error');
+    } finally {
+        btn.disabled = false;
+        btnText.style.display = 'inline';
+        btnLoading.style.display = 'none';
+    }
+});
+
+// Check if already logged in
+if (localStorage.getItem(tokenKey)) {
+    window.location.href = '/dashboard';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Micro Learning Platform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Learn Without Limits</h1>
+        <p>Discover courses that transform your skills. Learn at your own pace, anywhere, anytime.</p>
+        <div class="hero-actions">
+            <a href="{{ url_for('courses_page') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-play"></i> Explore Courses
+            </a>
+            <a href="{{ url_for('register_page') }}" class="btn btn-outline btn-lg">
+                Get Started Free
+            </a>
+        </div>
+        <div class="hero-stats">
+            <div class="stat">
+                <span class="stat-number">500+</span>
+                <span class="stat-label">Courses</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">10K+</span>
+                <span class="stat-label">Students</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">50+</span>
+                <span class="stat-label">Instructors</span>
+            </div>
+        </div>
+    </div>
+    <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600" alt="Learning">
+    </div>
+</section>
+
+<!-- Featured Courses -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Featured Courses</h2>
+            <a href="{{ url_for('courses_page') }}" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div class="course-grid" id="featuredCourses">
+            <!-- Loaded dynamically -->
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading courses...</div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories -->
+<section class="section bg-light">
+    <div class="container">
+        <div class="section-header">
+            <h2>Browse by Category</h2>
+        </div>
+        <div class="category-grid" id="categories">
+            <div class="category-card">
+                <i class="fas fa-code"></i>
+                <h3>Programming</h3>
+                <p>Learn to code</p>
+            </div>
+            <div class="category-card">
+                <i class="fas fa-globe"></i>
+                <h3>Web Development</h3>
+                <p>Build websites</p>
+            </div>
+            <div class="category-card">
+                <i class="fas fa-chart-line"></i>
+                <h3>Data Science</h3>
+                <p>Analyze data</p>
+            </div>
+            <div class="category-card">
+                <i class="fas fa-palette"></i>
+                <h3>Design</h3>
+                <p>Create designs</p>
+            </div>
+            <div class="category-card">
+                <i class="fas fa-briefcase"></i>
+                <h3>Business</h3>
+                <p>Grow business</p>
+            </div>
+            <div class="category-card">
+                <i class="fas fa-bullhorn"></i>
+                <h3>Marketing</h3>
+                <p>Marketing strategies</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>How It Works</h2>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <i class="fas fa-search"></i>
+                <h3>Find Your Course</h3>
+                <p>Browse thousands of courses across various categories and topics.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <i class="fas fa-user-plus"></i>
+                <h3>Enroll & Learn</h3>
+                <p>Sign up and start learning with video lessons and interactive content.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <i class="fas fa-tasks"></i>
+                <h3>Complete & Track</h3>
+                <p>Track your progress, complete quizzes, and earn certificates.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <i class="fas fa-certificate"></i>
+                <h3>Get Certified</h3>
+                <p>Earn certificates to showcase your new skills and knowledge.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section bg-light">
+    <div class="container">
+        <div class="section-header">
+            <h2>What Our Students Say</h2>
+        </div>
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <p>"MicroLearn transformed my career. The courses are well-structured and easy to follow."</p>
+                <div class="testimonial-author">
+                    <img src="https://ui-avatars.com/api/?name=Sarah+Johnson" alt="Sarah">
+                    <div>
+                        <h4>Sarah Johnson</h4>
+                        <span>Web Developer</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p>"The best learning platform I've used. The analytics help me track my progress effectively."</p>
+                <div class="testimonial-author">
+                    <img src="https://ui-avatars.com/api/?name=Mike+Chen" alt="Mike">
+                    <div>
+                        <h4>Mike Chen</h4>
+                        <span>Data Scientist</span>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p>"Amazing instructors and course content. I went from beginner to advanced in just a few months."</p>
+                <div class="testimonial-author">
+                    <img src="https://ui-avatars.com/api/?name=Emily+Davis" alt="Emily">
+                    <div>
+                        <h4>Emily Davis</h4>
+                        <span>UX Designer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2>Ready to Start Learning?</h2>
+        <p>Join thousands of learners and start your journey today.</p>
+        <a href="{{ url_for('register_page') }}" class="btn btn-primary btn-lg">Create Free Account</a>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadFeaturedCourses();
+    loadCategories();
+});
+
+async function loadFeaturedCourses() {
+    const container = document.getElementById('featuredCourses');
+    
+    try {
+        const response = await fetch('/api/courses/featured?limit=6');
+        const data = await response.json();
+        
+        if (data.success && data.data.length > 0) {
+            container.innerHTML = data.data.map(course => createCourseCard(course)).join('');
+        } else {
+            container.innerHTML = '<p class="no-courses">No featured courses yet.</p>';
+        }
+    } catch (error) {
+        container.innerHTML = '<p class="error">Failed to load courses.</p>';
+    }
+}
+
+async function loadCategories() {
+    const container = document.getElementById('categories');
+    
+    try {
+        const response = await fetch('/api/categories');
+        const data = await response.json();
+        
+        if (data.success && data.data.length > 0) {
+            container.innerHTML = data.data.map(cat => `
+                <a href="/courses?category=${cat.id}" class="category-card">
+                    <i class="fas fa-${cat.icon || 'book'}"></i>
+                    <h3>${cat.name}</h3>
+                    <p>${cat.description || ''}</p>
+                </a>
+            `).join('');
+        }
+    } catch (error) {
+        console.error('Failed to load categories:', error);
+    }
+}
+
+function createCourseCard(course) {
+    const image = course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400';
+    const rating = course.average_rating ? course.average_rating.toFixed(1) : '0.0';
+    
+    return `
+        <div class="course-card">
+            <div class="course-image">
+                <img src="${image}" alt="${course.title}">
+                <span class="course-badge">${course.difficulty}</span>
+            </div>
+            <div class="course-content">
+                <h3><a href="/course/${course.id}">${course.title}</a></h3>
+                <p class="course-instructor">By ${course.instructor_name || 'Instructor'}</p>
+                <div class="course-meta">
+                    <span class="rating"><i class="fas fa-star"></i> ${rating}</span>
+                    <span class="lessons"><i class="fas fa-book"></i> ${course.lesson_count || 0} lessons</span>
+                </div>
+                <div class="course-footer">
+                    <span class="price">${course.price === 0 ? 'Free' : '$' + course.price}</span>
+                    <a href="/course/${course.id}" class="btn btn-sm">View Course</a>
+                </div>
+            </div>
+        </div>
+    `;
+}
+</script>
+{% endblock %}

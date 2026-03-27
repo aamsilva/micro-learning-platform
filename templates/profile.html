@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Micro Learning Platform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+    <div class="container">
+        <div class="profile-header">
+            <div class="profile-cover">
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200" alt="Cover">
+            </div>
+            <div class="profile-info">
+                <div class="avatar-container">
+                    <img src="https://ui-avatars.com/api/?name=User&size=150" alt="Profile" id="profileAvatar">
+                    <button class="avatar-edit" onclick="document.getElementById('avatarInput').click()">
+                        <i class="fas fa-camera"></i>
+                    </button>
+                    <input type="file" id="avatarInput" accept="image/*" style="display:none">
+                </div>
+                <div class="profile-details">
+                    <h1 id="profileName">Loading...</h1>
+                    <p id="profileUsername">@username</p>
+                    <span class="badge" id="profileRole">Student</span>
+                </div>
+                <button class="btn btn-outline" id="editProfileBtn">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+            </div>
+        </div>
+        
+        <div class="profile-content">
+            <div class="profile-tabs">
+                <button class="tab active" data-tab="about">About</button>
+                <button class="tab" data-tab="activity">Activity</button>
+                <button class="tab" data-tab="settings">Settings</button>
+            </div>
+            
+            <div class="tab-content">
+                <!-- About Tab -->
+                <div id="about" class="tab-pane active">
+                    <div class="content-card">
+                        <h3>Biography</h3>
+                        <p id="profileBio">No bio yet.</p>
+                    </div>
+                    
+                    <div class="content-card">
+                        <h3>Learning Stats</h3>
+                        <div class="stats-grid" id="learningStats">
+                            <div class="stat-item">
+                                <i class="fas fa-book"></i>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="statEnrolled">0</span>
+                                    <span class="stat-label">Enrolled</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-check-circle"></i>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="statCompleted">0</span>
+                                    <span class="stat-label">Completed</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-certificate"></i>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="statCertificates">0</span>
+                                    <span class="stat-label">Certificates</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-clock"></i>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="statTime">0h</span>
+                                    <span class="stat-label">Learning Time</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Activity Tab -->
+                <div id="activity" class="tab-pane">
+                    <div class="content-card">
+                        <h3>Recent Activity</h3>
+                        <div class="activity-list" id="activityList">
+                            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Tab -->
+                <div id="settings" class="tab-pane">
+                    <div class="content-card">
+                        <h3>Account Settings</h3>
+                        <form id="profileForm">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <input type="text" id="inputFullName">
+                            </div>
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" id="inputUsername">
+                            </div>
+                            <div class="form-group">
+                                <label>Bio</label>
+                                <textarea id="inputBio" rows="4"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </form>
+                    </div>
+                    
+                    <div class="content-card">
+                        <h3>Change Password</h3>
+                        <form id="passwordForm">
+                            <div class="form-group">
+                                <label>Current Password</label>
+                                <input type="password" id="currentPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" id="newPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm New Password</label>
+                                <input type="password" id="confirmPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Change Password</button>
+                        </form>
+                    </div>
+                    
+                    <div class="content-card danger-zone">
+                        <h3>Danger Zone</h3>
+                        <p>Once you delete your account, there is no going back.</p>
+                        <button class="btn btn-danger">Delete Account</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentUser = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('lms_access_token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+    
+    loadProfile();
+    setupTabs();
+});
+
+function setupTabs() {
+    document.querySelectorAll('.profile-tabs .tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const tabId = this.dataset.tab;
+            
+            document.querySelectorAll('.profile-tabs .tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            
+            this.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+}
+
+async function loadProfile() {
+    const token = localStorage.getItem('lms_access_token');
+    
+    try {
+        const response = await fetch('/api/auth/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            currentUser = data.data;
+            updateProfileUI();
+            loadStats();
+            loadActivity();
+        }
+    } catch (error) {
+        console.error('Failed to load profile:', error);
+    }
+}
+
+function updateProfileUI() {
+    document.getElementById('profileName').textContent = currentUser.full_name;
+    document.getElementById('profileUsername').textContent = `@${currentUser.username}`;
+    document.getElementById('profileRole').textContent = currentUser.role;
+    document.getElementById('profileBio').textContent = currentUser.bio || 'No bio yet.';
+    
+    document.getElementById('inputFullName').value = currentUser.full_name;
+    document.getElementById('inputUsername').value = currentUser.username;
+    document.getElementById('inputBio').value = currentUser.bio || '';
+    
+    if (currentUser.avatar_url) {
+        document.getElementById('profileAvatar').src = currentUser.avatar_url;
+    }
+    
+    document.title = `${currentUser.full_name} - Micro Learning Platform`;
+}
+
+async function loadStats() {
+    const token = localStorage.getItem('lms_access_token');
+    
+    try {
+        const response = await fetch('/api/auth/stats', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            const stats = data.data.stats;
+            document.getElementById('statEnrolled').textContent = stats.enrolled_courses;
+            document.getElementById('statCompleted').textContent = stats.completed_courses;
+            document.getElementById('statCertificates').textContent = stats.certificates;
+            document.getElementById('statTime').textContent = stats.total_learning_time || '0h';
+        }
+    } catch (error) {
+        console.error('Failed to load stats:', error);
+    }
+}
+
+async function loadActivity() {
+    const token = localStorage.getItem('lms_access_token');
+    const container = document.getElementById('activityList');
+    
+    try {
+        const response = await fetch('/api/analytics/overview', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data.recent_activity) {
+            if (data.data.recent_activity.length > 0) {
+                container.innerHTML = data.data.recent_activity.map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-${getActivityIcon(activity.activity_type)}"></i>
+                        </div>
+                        <div class="activity-info">
+                            <p>${formatActivity(activity)}</p>
+                            <span class="activity-time">${formatTime(activity.created_at)}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p class="empty-state">No recent activity</p>';
+            }
+        } else {
+            container.innerHTML = '<p class="empty-state">No recent activity</p>';
+        }
+    } catch (error) {
+        console.error('Failed to load activity:', error);
+    }
+}
+
+function getActivityIcon(type) {
+    const icons = {
+        'course_enrolled': 'book-plus',
+        'lesson_completed': 'check-circle',
+        'quiz_submitted': 'question-circle',
+        'course_completed': 'trophy',
+        'user_login': 'sign-in-alt'
+    };
+    return icons[type] || 'circle';
+}
+
+function formatActivity(activity) {
+    const types = {
+        'course_enrolled': 'Enrolled in a course',
+        'lesson_completed': 'Completed a lesson',
+        'quiz_submitted': 'Completed a quiz',
+        'course_completed': 'Completed a course',
+        'user_login': 'Logged in'
+    };
+    return types[activity.activity_type] || activity.activity_type;
+}
+
+function formatTime(dateStr) {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = now - date;
+    
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `${Math.floor(diff/60000)} minutes ago`;
+    if (diff < 86400000) return `${Math.floor(diff/3600000)} hours ago`;
+    return date.toLocaleDateString();
+}
+
+// Update profile
+document.getElementById('profileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const token = localStorage.getItem('lms_access_token');
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    
+    try {
+        const response = await fetch('/api/auth/profile', {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                full_name: document.getElementById('inputFullName').value,
+                bio: document.getElementById('inputBio').value
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Profile updated!', 'success');
+            currentUser.full_name = document.getElementById('inputFullName').value;
+            currentUser.bio = document.getElementById('inputBio').value;
+            updateProfileUI();
+        } else {
+            showToast(data.error || 'Failed to update profile', 'error');
+        }
+    } catch (error) {
+        showToast('Network error', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Save Changes';
+    }
+});
+
+// Change password
+document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (newPassword !== confirmPassword) {
+        showToast('Passwords do not match', 'error');
+        return;
+    }
+    
+    const token = localStorage.getItem('lms_access_token');
+    const btn = this.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Changing...';
+    
+    try {
+        const response = await fetch('/api/auth/change-password', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                old_password: document.getElementById('currentPassword').value,
+                new_password: newPassword
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Password changed!', 'success');
+            this.reset();
+        } else {
+            showToast(data.error || 'Failed to change password', 'error');
+        }
+    } catch (error) {
+        showToast('Network error', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Change Password';
+    }
+});
+</script>
+{% endblock %}

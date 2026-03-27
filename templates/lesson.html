@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block title %}Lesson - Micro Learning Platform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/lesson.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="lesson-page">
+    <!-- Sidebar with lessons -->
+    <aside class="lesson-sidebar">
+        <div class="sidebar-header">
+            <a href="#" onclick="goBack()" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Course
+            </a>
+            <h2 id="courseTitle">Course</h2>
+        </div>
+        
+        <div class="lessons-nav" id="lessonsNav">
+            <!-- Lessons loaded via JS -->
+        </div>
+        
+        <div class="sidebar-footer">
+            <div class="progress-info">
+                <span>Progress</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="courseProgress" style="width: 0%"></div>
+                </div>
+                <span id="progressText">0%</span>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main lesson content -->
+    <main class="lesson-content">
+        <div class="lesson-header">
+            <div class="lesson-meta">
+                <span class="lesson-number" id="lessonNumber">Lesson 1</span>
+                <span class="lesson-duration" id="lessonDuration">0 min</span>
+            </div>
+            <h1 id="lessonTitle">Loading...</h1>
+        </div>
+        
+        <div class="lesson-body" id="lessonBody">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading lesson...</div>
+        </div>
+        
+        <!-- Quiz Section -->
+        <div class="quiz-section" id="quizSection" style="display: none;">
+            <div class="quiz-card">
+                <h3><i class="fas fa-question-circle"></i> Lesson Quiz</h3>
+                <p>Test your understanding with a quick quiz.</p>
+                <button class="btn btn-primary" id="startQuizBtn">Start Quiz</button>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="lesson-navigation">
+            <button class="btn btn-outline" id="prevBtn" disabled>
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <button class="btn btn-primary" id="completeBtn">
+                <i class="fas fa-check"></i> Mark Complete
+            </button>
+            <button class="btn btn-outline" id="nextBtn">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const lessonId = {{ lesson_id }};
+let currentLesson = null;
+let prevLessonId = null;
+let nextLessonId = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('lms_access_token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+    
+    loadLesson();
+});
+
+async function loadLesson() {
+    const token = localStorage.getItem('lms_access_token');
+    
+    try {
+        const response = await fetch(`/api/lessons/${lessonId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            currentLesson = data.data;
+            updateLessonUI();
+            loadCourseLessons();
+            startTimeTracking();
+        } else {
+            showToast('Lesson not found', 'error');
+            setTimeout(() => window.location.href = '/courses', 2000);
+        }
+    } catch (error) {
+        console.error('Failed to load lesson:', error);
+    }
+}
+
+function updateLessonUI() {
+    document.title = `${currentLesson.title} - Micro Learning Platform`;
+    document.getElementById('lessonTitle').textContent = currentLesson.title;
+    document.getElementById('lessonDuration').textContent = `${currentLesson.duration_minutes || 0} min`;
+    
+    // Render content
+    const body = document.getElementById('lessonBody');
+    
+    if (currentLesson.content_type === 'video') {
+        body.innerHTML = `
+            <div class="video-container">
+                <video controls>
+                    <source src="${currentLesson.video_url || ''}" type="video/mp4">
+                    Your browser does not support video playback.
+                </video>
+            </div>
+        `;
+    }
+    
+    // Add text content
+    body.innerHTML += `
+        <div class="content-text">
+            ${renderMarkdown(currentLesson.content || '')}
+        </div>
+    `;
+    
+    // Check for quiz
+    if (currentLesson.has_quiz) {
+        document.getElementById('quizSection').style.display = 'block';
+        document.getElementById('startQuizBtn').onclick = () => window.location.href = `/quiz/${currentLesson.quiz_id}`;
+    }
+}
+
+function renderMarkdown(text) {
+    // Simple markdown rendering
+    let html = text;
+    
+    // Headers
+    html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+    
+    // Bold
+    html = html.replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>');
+    
+    // Italic
+    html = html.replace(/\*(.*)\*/gim, '<em>$1</em>');
+    
+    // Code blocks
+    html = html.replace(/```(\w*)\n([\s\S]*?)```/gim, '<pre><code class="language-$1">$2</code></pre>');
+    
+    // Inline code
+    html = html.replace(/`(.*?)`/gim, '<code>$1</code>');
+    
+    // Lists
+    html = html.replace(/^\s*-\s+(.*)$/gim, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+    
+    // Numbered lists
+    html = html.replace(/^\s*\d+\.\s+(.*)$/gim, '<li>$1</li>');
+    
+    // Paragraphs
+    html = html.replace(/\n\n/gim, '</p><p>');
+    html = '<p>' + html + '</p>';
+    
+    // Clean up empty paragraphs
+    html = html.replace(/<p><\/p>/g, '');
+    
+    return html;
+}
+
+async function loadCourseLessons() {
+    const token = localStorage.getItem('lms_access_token');
+    
+    try {
+        const response = await fetch(`/api/courses/${currentLesson.course_id}/lessons`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            renderLessonsNav(data.data);
+            updateNavigation(data.data);
+            updateProgress(data.data);
+        }
+    } catch (error) {
+        console.error('Failed to load course lessons:', error);
+    }
+}
+
+function renderLessonsNav(lessons) {
+    const nav = document.getElementById('lessonsNav');
+    
+    nav.innerHTML = lessons.map(lesson => `
+        <a href="/lesson/${lesson.id}" class="lesson-link ${lesson.id === lessonId ? 'active' : ''} ${lesson.completed ? 'completed' : ''}">
+            <span class="lesson-icon">
+                ${lesson.completed ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-play-circle"></i>'}
+            </span>
+            <span class="lesson-title">${lesson.title}</span>
+        </a>
+    `).join('');
+}
+
+function updateNavigation(lessons) {
+    const currentIndex = lessons.findIndex(l => l.id === lessonId);
+    
+    prevLessonId = currentIndex > 0 ? lessons[currentIndex - 1].id : null;
+    nextLessonId = currentIndex < lessons.length - 1 ? lessons[currentIndex + 1].id : null;
+    
+    document.getElementById('prevBtn').disabled = !prevLessonId;
+    document.getElementById('nextBtn').disabled = !nextLessonId;
+    
+    if (prevLessonId) {
+        document.getElementById('prevBtn').onclick = () => window.location.href = `/lesson/${prevLessonId}`;
+    }
+    
+    if (nextLessonId) {
+        document.getElementById('nextBtn').onclick = () => window.location.href = `/lesson/${nextLessonId}`;
+    }
+}
+
+function updateProgress(lessons) {
+    const completed = lessons.filter(l => l.completed).length;
+    const total = lessons.length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    
+    document.getElementById('courseProgress').style.width = `${percentage}%`;
+    document.getElementById('progressText').textContent = `${percentage}%`;
+}
+
+let timeSpent = 0;
+let timeTracker = null;
+
+function startTimeTracking() {
+    timeTracker = setInterval(() => {
+        timeSpent += 10;
+    }, 10000); // Update every 10 seconds
+}
+
+function stopTimeTracking() {
+    if (timeTracker) {
+        clearInterval(timeTracker);
+    }
+    
+    // Send time spent to server
+    if (timeSpent > 0) {
+        const token = localStorage.getItem('lms_access_token');
+        fetch(`/api/lessons/${lessonId}/progress`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ time_spent: timeSpent })
+        });
+    }
+}
+
+// Mark complete button
+document.getElementById('completeBtn').addEventListener('click', async function() {
+    const token = localStorage.getItem('lms_access_token');
+    if (!token) return;
+    
+    this.disabled = true;
+    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    
+    try {
+        const response = await fetch(`/api/lessons/${lessonId}/complete`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ time_spent: timeSpent })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Lesson marked as complete!', 'success');
+            
+            if (nextLessonId) {
+                setTimeout(() => {
+                    window.location.href = `/lesson/${nextLessonId}`;
+                }, 1000);
+            }
+        } else {
+            showToast(data.error || 'Failed to mark complete', 'error');
+            this.disabled = false;
+        }
+    } catch (error) {
+        showToast('Network error', 'error');
+        this.disabled = false;
+    }
+});
+
+function goBack() {
+    window.location.href = `/course/${currentLesson.course_id}`;
+}
+
+// Cleanup on page leave
+window.addEventListener('beforeunload', stopTimeTracking);
+</script>
+{% endblock %}

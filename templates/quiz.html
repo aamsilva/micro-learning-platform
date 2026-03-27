@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz - Micro Learning Platform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/quiz.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="quiz-page">
+    <div class="quiz-container">
+        <!-- Quiz Header -->
+        <div class="quiz-header">
+            <div class="quiz-info">
+                <h1 id="quizTitle">Quiz</h1>
+                <p id="quizDescription"></p>
+            </div>
+            <div class="quiz-timer" id="quizTimer" style="display: none;">
+                <i class="fas fa-clock"></i>
+                <span id="timerDisplay">00:00</span>
+            </div>
+        </div>
+        
+        <!-- Quiz Content -->
+        <div class="quiz-content" id="quizContent">
+            <div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading quiz...</div>
+        </div>
+        
+        <!-- Quiz Results -->
+        <div class="quiz-results" id="quizResults" style="display: none;">
+            <div class="results-card">
+                <div class="results-icon" id="resultsIcon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h2 id="resultsTitle">Quiz Complete!</h2>
+                <div class="results-score">
+                    <span class="score-value" id="scoreValue">0</span>
+                    <span class="score-label">%</span>
+                </div>
+                <p id="resultsMessage">You passed the quiz!</p>
+                <div class="results-details">
+                    <div class="detail">
+                        <span class="label">Correct Answers</span>
+                        <span class="value" id="correctCount">0</span>
+                    </div>
+                    <div class="detail">
+                        <span class="label">Total Questions</span>
+                        <span class="value" id="totalQuestions">0</span>
+                    </div>
+                    <div class="detail">
+                        <span class="label">Passing Score</span>
+                        <span class="value" id="passingScore">70%</span>
+                    </div>
+                </div>
+                <div class="results-actions">
+                    <button class="btn btn-outline" id="retryBtn">
+                        <i class="fas fa-redo"></i> Try Again
+                    </button>
+                    <button class="btn btn-primary" id="continueBtn">
+                        Continue <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quiz Navigation -->
+        <div class="quiz-navigation" id="quizNav">
+            <button class="btn btn-outline" id="prevQuestion" disabled>
+                <i class="fas fa-chevron-left"></i> Previous
+            </button>
+            <div class="question-dots" id="questionDots"></div>
+            <button class="btn btn-primary" id="nextQuestion">
+                Next <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const quizId = {{ quiz_id }};
+let quizData = null;
+let currentQuestion = 0;
+let userAnswers = [];
+let timerInterval = null;
+let timeRemaining = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('lms_access_token');
+    if (!token) {
+        window.location.href = '/login';
+        return;
+    }
+    
+    loadQuiz();
+});
+
+async function loadQuiz() {
+    const token = localStorage.getItem('lms_access_token');
+    
+    try {
+        const response = await fetch(`/api/quizzes/${quizId}/retry`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            quizData = data.data;
+            renderQuiz();
+            initTimer();
+        } else {
+            showToast('Quiz not found', 'error');
+            setTimeout(() => window.history.back(), 2000);
+        }
+    } catch (error) {
+        console.error('Failed to load quiz:', error);
+    }
+}
+
+function renderQuiz() {
+    document.getElementById('quizTitle').textContent = quizData.quiz.title;
+    document.getElementById('quizDescription').textContent = quizData.quiz.description || '';
+    document.getElementById('passingScore').textContent = `${quizData.quiz.passing_score}%`;
+    
+    if (quizData.quiz.time_limit_minutes) {
+        document.getElementById('quizTimer').style.display = 'flex';
+        timeRemaining = quizData.quiz.time_limit_minutes * 60;
+    }
+    
+    // Initialize answers array
+    userAnswers = new Array(quizData.quiz.questions.length).fill(null);
+    
+    renderQuestion();
+    renderDots();
+}
+
+function renderQuestion() {
+    const container = document.getElementById('quizContent');
+    const question = quizData.quiz.questions[currentQuestion];
+    
+    if (!question) return;
+    
+    container.innerHTML = `
+        <div class="question-card">
+            <div class="question-number">
+                Question ${currentQuestion + 1} of ${quizData.quiz.questions.length}
+            </div>
+            <h3 class="question-text">${question.question}</h3>
+            <div class="options-list">
+                ${question.options.map((option, index) => `
+                    <label class="option-item ${userAnswers[currentQuestion] === index ? 'selected' : ''}">
+                        <input type="radio" name="answer" value="${index}" 
+                               ${userAnswers[currentQuestion] === index ? 'checked' : ''}>
+                        <span class="option-marker">${String.fromCharCode(65 + index)}</span>
+                        <span class="option-text">${option}</span>
+                    </label>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    
+    // Add event listeners
+    container.querySelectorAll('input[name="answer"]').forEach(input => {
+        input.addEventListener('change', function() {
+            userAnswers[currentQuestion] = parseInt(this.value);
+            renderQuestion();
+            renderDots();
+        });
+    });
+    
+    // Update navigation
+    document.getElementById('prevQuestion').disabled = currentQuestion === 0;
+    document.getElementById('nextQuestion').textContent = 
+        currentQuestion === quizData.quiz.questions.length - 1 ? 'Submit' : 'Next';
+}
+
+function renderDots() {
+    const dotsContainer = document.getElementById('questionDots');
+    
+    dotsContainer.innerHTML = quizData.quiz.questions.map((_, index) => {
+        let className = 'dot';
+        if (index === currentQuestion) className += ' active';
+        else if (userAnswers[index] !== null) className += ' answered';
+        
+        return `<span class="${className}" onclick="goToQuestion(${index})"></span>`;
+    }).join('');
+}
+
+function goToQuestion(index) {
+    currentQuestion = index;
+    renderQuestion();
+    renderDots();
+}
+
+// Navigation buttons
+document.getElementById('prevQuestion').addEventListener('click', function() {
+    if (currentQuestion > 0) {
+        currentQuestion--;
+        renderQuestion();
+        renderDots();
+    }
+});
+
+document.getElementById('nextQuestion').addEventListener('click', async function() {
+    if (userAnswers[currentQuestion] === null) {
+        showToast('Please select an answer', 'warning');
+        return;
+    }
+    
+    if (currentQuestion < quizData.quiz.questions.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+        renderDots();
+    } else {
+        // Submit quiz
+        await submitQuiz();
+    }
+});
+
+function initTimer() {
+    if (!quizData.quiz.time_limit_minutes) return;
+    
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        
+        const minutes = Math.floor(timeRemaining / 60);
+        const seconds = timeRemaining % 60;
+        document.getElementById('timerDisplay').textContent = 
+            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            submitQuiz();
+        }
+    }, 1000);
+}
+
+async function submitQuiz() {
+    clearInterval(timerInterval);
+    
+    const token = localStorage.getItem('lms_access_token');
+    const btn = document.getElementById('nextQuestion');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    
+    try {
+        const response = await fetch(`/api/quizzes/${quizId}/submit`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ answers: userAnswers.map((a, i) => ({ selected: a })) })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showResults(data.data);
+        } else {
+            showToast(data.error || 'Failed to submit quiz', 'error');
+            btn.disabled = false;
+        }
+    } catch (error) {
+        showToast('Network error', 'error');
+        btn.disabled = false;
+    }
+}
+
+function showResults(results) {
+    document.getElementById('quizContent').style.display = 'none';
+    document.getElementById('quizNav').style.display = 'none';
+    document.getElementById('quizResults').style.display = 'flex';
+    
+    document.getElementById('scoreValue').textContent = results.score;
+    document.getElementById('correctCount').textContent = results.correct_answers;
+    document.getElementById('totalQuestions').textContent = results.total_questions;
+    
+    const icon = document.getElementById('resultsIcon');
+    const title = document.getElementById('resultsTitle');
+    const message = document.getElementById('resultsMessage');
+    
+    if (results.passed) {
+        icon.classList.add('success');
+        icon.innerHTML = '<i class="fas fa-trophy"></i>';
+        title.textContent = 'Congratulations!';
+        message.textContent = 'You passed the quiz!';
+    } else {
+        icon.classList.add('error');
+        icon.innerHTML = '<i class="fas fa-times-circle"></i>';
+        title.textContent = 'Keep Trying!';
+        message.textContent = `You need ${results.passing_score}% to pass. Try again!`;
+    }
+}
+
+// Retry button
+document.getElementById('retryBtn').addEventListener('click', function() {
+    window.location.reload();
+});
+
+// Continue button
+document.getElementById('continueBtn').addEventListener('click', function() {
+    window.history.back();
+});
+</script>
+{% endblock %}

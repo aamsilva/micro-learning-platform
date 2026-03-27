@@ -1,0 +1,320 @@
+/* ============================================
+   Profile Styles
+   ============================================ */
+
+.profile-page {
+    min-height: 100vh;
+}
+
+.profile-cover {
+    height: 200px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+}
+
+.profile-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.3;
+}
+
+.profile-info {
+    display: flex;
+    align-items: flex-end;
+    gap: 2rem;
+    margin-top: -60px;
+    padding: 0 2rem 2rem;
+    position: relative;
+}
+
+.avatar-container {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.avatar-container img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 5px solid var(--white);
+    object-fit: cover;
+    box-shadow: var(--shadow);
+}
+
+.avatar-edit {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--white);
+    border: 3px solid var(--white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.avatar-edit:hover {
+    background: var(--primary-dark);
+}
+
+.profile-details {
+    flex: 1;
+    padding-bottom: 0.5rem;
+}
+
+.profile-details h1 {
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.profile-details .badge {
+    display: inline-block;
+    margin-top: 0.5rem;
+}
+
+.profile-details p {
+    color: var(--gray);
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .profile-info {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .avatar-container img {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+/* Profile Content */
+.profile-content {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* Profile Tabs */
+.profile-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.profile-tabs .tab {
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    font-weight: 500;
+    color: var(--gray);
+    cursor: pointer;
+    position: relative;
+}
+
+.profile-tabs .tab::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--primary);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.profile-tabs .tab:hover {
+    color: var(--dark);
+}
+
+.profile-tabs .tab.active {
+    color: var(--primary);
+}
+
+.profile-tabs .tab.active::after {
+    transform: scaleX(1);
+}
+
+.tab-content .tab-pane {
+    display: none;
+}
+
+.tab-content .tab-pane.active {
+    display: block;
+}
+
+/* Content Card */
+.profile-content .content-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.profile-content .content-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--light);
+}
+
+/* Learning Stats */
+.profile-content .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+}
+
+.profile-content .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--light);
+    border-radius: var(--radius);
+}
+
+.profile-content .stat-item i {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.profile-content .stat-info {
+    flex: 1;
+}
+
+.profile-content .stat-value {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.profile-content .stat-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+@media (max-width: 768px) {
+    .profile-content .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Activity List */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--light);
+    border-radius: var(--radius);
+}
+
+.activity-item .activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.activity-item .activity-info {
+    flex: 1;
+}
+
+.activity-item .activity-info p {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.activity-item .activity-time {
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+/* Settings Form */
+.settings-form .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.settings-form label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.settings-form input,
+.settings-form textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--gray-light);
+    border-radius: var(--radius);
+    font-size: 1rem;
+}
+
+.settings-form input:focus,
+.settings-form textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Danger Zone */
+.danger-zone {
+    border: 1px solid var(--danger);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.danger-zone h3 {
+    color: var(--danger);
+    border-bottom-color: rgba(239, 68, 68, 0.2);
+}
+
+.danger-zone p {
+    color: var(--gray);
+    margin-bottom: 1rem;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: var(--white);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+/* Empty State */
+.profile-page .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: var(--gray);
+}

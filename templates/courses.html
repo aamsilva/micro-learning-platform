@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}Courses - Micro Learning Platform{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/courses.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="courses-page">
+    <div class="page-header">
+        <div class="container">
+            <h1>Explore Courses</h1>
+            <p>Discover courses that match your interests and goals</p>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="courses-layout">
+            <!-- Filters Sidebar -->
+            <aside class="filters-sidebar">
+                <div class="filter-section">
+                    <h3>Search</h3>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Search courses...">
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <h3>Category</h3>
+                    <select id="categoryFilter" class="filter-select">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+                
+                <div class="filter-section">
+                    <h3>Difficulty</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="radio" name="difficulty" value="" checked>
+                            <span>All Levels</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="difficulty" value="beginner">
+                            <span>Beginner</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="difficulty" value="intermediate">
+                            <span>Intermediate</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="difficulty" value="advanced">
+                            <span>Advanced</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="filter-section">
+                    <h3>Price</h3>
+                    <div class="filter-options">
+                        <label class="filter-option">
+                            <input type="radio" name="price" value="" checked>
+                            <span>All Prices</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="price" value="free">
+                            <span>Free</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="radio" name="price" value="paid">
+                            <span>Paid</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button class="btn btn-outline btn-block" id="applyFilters">
+                    <i class="fas fa-filter"></i> Apply Filters
+                </button>
+                <button class="btn btn-ghost btn-block" id="clearFilters">
+                    Clear All
+                </button>
+            </aside>
+            
+            <!-- Courses Grid -->
+            <div class="courses-main">
+                <div class="courses-toolbar">
+                    <div class="results-count">
+                        <span id="resultsCount">Loading courses...</span>
+                    </div>
+                    <div class="sort-options">
+                        <select id="sortSelect" class="filter-select">
+                            <option value="created_at-desc">Newest First</option>
+                            <option value="created_at-asc">Oldest First</option>
+                            <option value="title-asc">Title A-Z</option>
+                            <option value="title-desc">Title Z-A</option>
+                            <option value="average_rating-desc">Highest Rated</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="courses-grid" id="coursesGrid">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading courses...
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="pagination" id="pagination">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentPage = 1;
+let filters = {
+    search: '',
+    category_id: '',
+    difficulty: '',
+    sort_by: 'created_at',
+    sort_order: 'desc'
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadCategories();
+    loadCourses();
+    setupEventListeners();
+});
+
+function setupEventListeners() {
+    document.getElementById('searchInput').addEventListener('input', debounce(function() {
+        filters.search = this.value;
+        currentPage = 1;
+        loadCourses();
+    }, 500));
+    
+    document.getElementById('categoryFilter').addEventListener('change', function() {
+        filters.category_id = this.value;
+        currentPage = 1;
+        loadCourses();
+    });
+    
+    document.querySelectorAll('input[name="difficulty"]').forEach(input => {
+        input.addEventListener('change', function() {
+            filters.difficulty = this.value;
+            currentPage = 1;
+            loadCourses();
+        });
+    });
+    
+    document.getElementById('sortSelect').addEventListener('change', function() {
+        const [sort_by, sort_order] = this.value.split('-');
+        filters.sort_by = sort_by;
+        filters.sort_order = sort_order;
+        currentPage = 1;
+        loadCourses();
+    });
+    
+    document.getElementById('applyFilters').addEventListener('click', function() {
+        loadCourses();
+    });
+    
+    document.getElementById('clearFilters').addEventListener('click', function() {
+        filters = {
+            search: '',
+            category_id: '',
+            difficulty: '',
+            sort_by: 'created_at',
+            sort_order: 'desc'
+        };
+        document.getElementById('searchInput').value = '';
+        document.getElementById('categoryFilter').value = '';
+        document.querySelector('input[name="difficulty"][value=""]').checked = true;
+        document.getElementById('sortSelect').value = 'created_at-desc';
+        currentPage = 1;
+        loadCourses();
+    });
+}
+
+async function loadCategories() {
+    try {
+        const response = await fetch('/api/categories');
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = document.getElementById('categoryFilter');
+            data.data.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.id;
+                option.textContent = cat.name;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Failed to load categories:', error);
+    }
+}
+
+async function loadCourses() {
+    const container = document.getElementById('coursesGrid');
+    const countEl = document.getElementById('resultsCount');
+    
+    container.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Loading courses...</div>';
+    
+    try {
+        let url = `/api/courses?page=${currentPage}&per_page=12`;
+        if (filters.search) url += `&search=${encodeURIComponent(filters.search)}`;
+        if (filters.category_id) url += `&category_id=${filters.category_id}`;
+        if (filters.difficulty) url += `&difficulty=${filters.difficulty}`;
+        url += `&sort_by=${filters.sort_by}&sort_order=${filters.sort_order}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success) {
+            countEl.textContent = `${data.data.total} courses found`;
+            
+            if (data.data.courses.length > 0) {
+                container.innerHTML = data.data.courses.map(course => createCourseCard(course)).join('');
+                updatePagination(data.data);
+            } else {
+                container.innerHTML = '<div class="empty-state">No courses found. Try adjusting your filters.</div>';
+                document.getElementById('pagination').innerHTML = '';
+            }
+        }
+    } catch (error) {
+        console.error('Failed to load courses:', error);
+        container.innerHTML = '<div class="error">Failed to load courses. Please try again.</div>';
+    }
+}
+
+function createCourseCard(course) {
+    const image = course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400';
+    const rating = course.average_rating ? course.average_rating.toFixed(1) : '0.0';
+    
+    return `
+        <div class="course-card">
+            <div class="course-image">
+                <img src="${image}" alt="${course.title}">
+                <span class="course-badge">${course.difficulty}</span>
+            </div>
+            <div class="course-content">
+                <h3><a href="/course/${course.id}">${course.title}</a></h3>
+                <p class="course-description">${truncate(course.description, 100)}</p>
+                <p class="course-instructor">By ${course.instructor_name || 'Instructor'}</p>
+                <div class="course-meta">
+                    <span class="rating"><i class="fas fa-star"></i> ${rating}</span>
+                    <span class="lessons"><i class="fas fa-book"></i> ${course.lesson_count || 0}</span>
+                    <span class="students"><i class="fas fa-users"></i> ${course.enrollment_count || 0}</span>
+                </div>
+                <div class="course-footer">
+                    <span class="price">${course.price === 0 ? 'Free' : '$' + course.price}</span>
+                    <a href="/course/${course.id}" class="btn btn-sm">View Course</a>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function updatePagination(data) {
+    const container = document.getElementById('pagination');
+    
+    if (data.pages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    
+    if (data.has_prev) {
+        html += `<button class="btn btn-sm" onclick="goToPage(${data.page - 1})"><i class="fas fa-chevron-left"></i></button>`;
+    }
+    
+    for (let i = 1; i <= data.pages; i++) {
+        if (i === data.page) {
+            html += `<span class="page-active">${i}</span>`;
+        } else if (i === 1 || i === data.pages || (i >= data.page - 2 && i <= data.page + 2)) {
+            html += `<button class="btn btn-sm" onclick="goToPage(${i})">${i}</button>`;
+        } else if (i === data.page - 3 || i === data.page + 3) {
+            html += `<span>...</span>`;
+        }
+    }
+    
+    if (data.has_next) {
+        html += `<button class="btn btn-sm" onclick="goToPage(${data.page + 1})"><i class="fas fa-chevron-right"></i></button>`;
+    }
+    
+    container.innerHTML = html;
+}
+
+function goToPage(page) {
+    currentPage = page;
+    loadCourses();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function truncate(text, length) {
+    if (!text) return '';
+    return text.length > length ? text.substring(0, length) + '...' : text;
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+</script>
+{% endblock %}
