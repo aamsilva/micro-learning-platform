@@ -5,7 +5,7 @@ See what colleagues are learning, discussions, collaborative learning
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models import User, Course, Enrollment, Progress, Lesson
-from src import db
+from src.models import db
 from datetime import datetime, timedelta
 from sqlalchemy import func
 
@@ -169,7 +169,7 @@ def learning_teams():
         }
     })
 
-@social_bp.feeds('/feed')
+@social_bp.route('/feed')
 @jwt_required()
 def learning_feed():
     """Personalized learning feed - like a social feed"""
