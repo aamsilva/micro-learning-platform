@@ -153,9 +153,14 @@ def register_blueprints(app):
         app: Flask application instance
     """
     from src.api import api_bp
+from src.corporate import corporate_bp, ai_bp
     
     # Register API blueprint
     app.register_blueprint(api_bp, url_prefix='/api')
+    
+    # Register Corporate (B2B) blueprint
+    app.register_blueprint(corporate_bp, url_prefix='/corporate')
+    app.register_blueprint(ai_bp, url_prefix='/ai')
     
     # Register main routes
     @app.route('/')
