@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroLearn Pro - Learn Smarter</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            /* Duolingo-inspired palette */
+            --duo-green: #58cc02;
+            --duo-green-dark: #46a302;
+            --duo-red: #ff4b4b;
+            --duo-yellow: #ffc800;
+            --duo-purple: #a628f6;
+            --duo-blue: #1cb0f6;
+            --duo-pink: #ff9600;
+            
+            /* Base colors */
+            --primary: var(--duo-green);
+            --primary-dark: var(--duo-green-dark);
+            --secondary: var(--duo-blue);
+            --accent: var(--duo-yellow);
+            
+            /* Neutrals - clean grays */
+            --gray-900: #1a1a1a;
+            --gray-800: #333333;
+            --gray-700: #4d4d4d;
+            --gray-600: #666666;
+            --gray-500: #808080;
+            --gray-400: #999999;
+            --gray-300: #b3b3b3;
+            --gray-200: #e5e5e5;
+            --gray-100: #f2f2f2;
+            --gray-50: #fafafa;
+            --white: #ffffff;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+            --shadow-lg: 0 8px 32px rgba(0,0,0,0.15);
+            
+            /* Border radius - Duolingo style */
+            --radius-sm: 8px;
+            --radius: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-full: 9999px;
+            
+            /* Spacing */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Nunito', 'DM Sans', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+        
+        /* ========== NAVIGATION ========== */
+        .navbar {
+            background: var(--white);
+            padding: var(--space-md) var(--space-xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--duo-green);
+        }
+        
+        .navbar-brand i {
+            font-size: 1.8rem;
+        }
+        
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: var(--space-lg);
+        }
+        
+        .nav-link {
+            padding: var(--space-sm) var(--space-md);
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+        
+        .nav-link.active {
+            background: var(--duo-green);
+            color: var(--white);
+        }
+        
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+        
+        /* Streak counter - Duolingo style */
+        .streak-badge {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            background: linear-gradient(135deg, #ff9600, #ffc800);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-full);
+            color: var(--white);
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .streak-badge i {
+            font-size: 1.1rem;
+        }
+        
+        /* User avatar */
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            background: var(--duo-purple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .user-avatar:hover {
+            transform: scale(1.1);
+        }
+        
+        /* ========== HERO SECTION ========== */
+        .hero {
+            background: var(--white);
+            padding: var(--space-3xl) var(--space-xl);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(88, 204, 2, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(88, 204, 2, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: var(--space-md);
+            line-height: 1.1;
+        }
+        
+        .hero h1 span {
+            color: var(--duo-green);
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--gray-600);
+            margin-bottom: var(--space-xl);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-2xl);
+            margin-top: var(--space-xl);
+        }
+        
+        .hero-stat {
+            text-align: center;
+        }
+        
+        .hero-stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--duo-green);
+        }
+        
+        .hero-stat-label {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        /* ========== DASHBOARD GRID ========== */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: var(--space-xl);
+            padding: var(--space-xl);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+        
+        .sidebar-section {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .sidebar-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-400);
+            font-weight: 700;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius);
+            color: var(--gray-700);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .sidebar-item:hover {
+            background: var(--gray-100);
+            color: var(--gray-900);
+        }
+        
+        .sidebar-item.active {
+            background: var(--duo-green);
+            color: var(--white);
+        }
+        
+        .sidebar-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        .sidebar-badge {
+            margin-left: auto;
+            background: var(--gray-200);
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        
+        .sidebar-item.active .sidebar-badge {
+            background: rgba(255,255,255,0.2);
+            color: var(--white);
+        }
+        
+        /* Main content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xl);
+        }
+        
+        /* Progress Card */
+        .progress-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .progress-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        
+        .progress-streak {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            background: linear-gradient(135deg, #ff9600, #ffc800);
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-full);
+            color: var(--white);
+            font-weight: 700;
+        }
+        
+        .progress-bar-container {
+            margin-bottom: var(--space-md);
+        }
+        
+        .progress-bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .progress-bar {
+            height: 24px;
+            background: var(--gray-200);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--duo-green), #7bed3f);
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* ========== COURSE CARDS ========== */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        
+        .section-link {
+            color: var(--duo-blue);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        .section-link:hover {
+            text-decoration: underline;
+        }
+        
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: var(--space-lg);
+        }
+        
+        .course-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .course-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .course-image {
+            height: 140px;
+            background: linear-gradient(135deg, var(--duo-green) 0%, var(--duo-blue) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .course-image::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+        }
+        
+        .course-badge {
+            position: absolute;
+            top: var(--space-sm);
+            right: var(--space-sm);
+            background: var(--white);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--gray-700);
+        }
+        
+        .course-content {
+            padding: var(--space-lg);
+        }
+        
+        .course-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .course-description {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            margin-bottom: var(--space-md);
+            line-height: 1.4;
+        }
+        
+        .course-meta {
+            display: flex;
+            gap: var(--space-md);
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-bottom: var(--space-md);
+        }
+        
+        .course-meta span {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        .course-progress {
+            margin-top: var(--space-md);
+        }
+        
+        .course-progress-bar {
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+        
+        .course-progress-fill {
+            height: 100%;
+            background: var(--duo-green);
+            border-radius: var(--radius-full);
+        }
+        
+        .course-progress-text {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: var(--space-xs);
+        }
+        
+        /* ========== ACHIEVEMENTS ========== */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--space-md);
+        }
+        
+        .achievement-card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+        
+        .achievement-card:hover {
+            transform: scale(1.02);
+        }
+        
+        .achievement-card.earned {
+            border: 2px solid var(--duo-yellow);
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        }
+        
+        .achievement-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius);
+            background: var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .achievement-card.earned .achievement-icon {
+            background: linear-gradient(135deg, var(--duo-yellow), var(--duo-pink));
+            color: var(--white);
+        }
+        
+        .achievement-info h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+        
+        .achievement-info p {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        
+        .achievement-points {
+            font-size: 0.75rem;
+            color: var(--duo-yellow);
+            font-weight: 700;
+        }
+        
+        /* ========== LEADERBOARD ========== */
+        .leaderboard {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .leaderboard-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .leaderboard-tabs {
+            display: flex;
+            gap: var(--space-sm);
+        }
+        
+        .leaderboard-tab {
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            background: var(--gray-100);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .leaderboard-tab.active {
+            background: var(--duo-blue);
+            color: var(--white);
+        }
+        
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            padding: var(--space-sm);
+            border-radius: var(--radius);
+            transition: background 0.2s ease;
+        }
+        
+        .leaderboard-item:hover {
+            background: var(--gray-50);
+        }
+        
+        .leaderboard-rank {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.875rem;
+        }
+        
+        .leaderboard-rank.gold {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: var(--white);
+        }
+        
+        .leaderboard-rank.silver {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+            color: var(--white);
+        }
+        
+        .leaderboard-rank.bronze {
+            background: linear-gradient(135deg, #b45309, #92400e);
+            color: var(--white);
+        }
+        
+        .leaderboard-rank.default {
+            background: var(--gray-200);
+            color: var(--gray-600);
+        }
+        
+        .leaderboard-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            flex: 1;
+        }
+        
+        .leaderboard-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-full);
+            background: var(--duo-purple);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+        
+        .leaderboard-name {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        .leaderboard-stats {
+            display: flex;
+            gap: var(--space-lg);
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+        
+        .leaderboard-stat {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+        
+        .leaderboard-points {
+            font-weight: 700;
+            color: var(--duo-green);
+        }
+        
+        /* ========== FOOTER ========== */
+        .footer {
+            background: var(--gray-900);
+            color: var(--gray-400);
+            padding: var(--space-2xl) var(--space-xl);
+            text-align: center;
+            margin-top: var(--space-3xl);
+        }
+        
+        .footer-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: var(--space-md);
+        }
+        
+        .footer p {
+            font-size: 0.875rem;
+        }
+        
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                position: static;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-stats {
+                flex-direction: column;
+                gap: var(--space-lg);
+            }
+            
+            .navbar {
+                padding: var(--space-md);
+            }
+            
+            .navbar-nav {
+                display: none;
+            }
+            
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Button styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-full);
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: var(--duo-green);
+            color: var(--white);
+            box-shadow: 0 4px 0 var(--duo-green-dark);
+        }
+        
+        .btn-primary:hover {
+            background: var(--duo-green-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 var(--duo-green-dark);
+        }
+        
+        .btn-primary:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 var(--duo-green-dark);
+        }
+        
+        .btn-secondary {
+            background: var(--gray-200);
+            color: var(--gray-700);
+            box-shadow: 0 4px 0 var(--gray-300);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--gray-300);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="#" class="navbar-brand">
+            <i class="fas fa-graduation-cap"></i>
+            MicroLearn Pro
+        </a>
+        
+        <div class="navbar-nav">
+            <a href="#" class="nav-link active">Learn</a>
+            <a href="#" class="nav-link">Practice</a>
+            <a href="#" class="nav-link">Leaderboard</a>
+            <a href="#" class="nav-link">Profile</a>
+            <a href="#" class="nav-link">Teams</a>
+        </div>
+        
+        <div class="navbar-actions">
+            <div class="streak-badge">
+                <i class="fas fa-fire"></i>
+                <span>14 day streak</span>
+            </div>
+            <div class="user-avatar">AS</div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Learn <span>Smarter</span>, Not Longer</h1>
+            <p>Master new skills with bite-sized lessons, AI-powered learning, and a community of motivated learners.</p>
+            
+            <div style="display: flex; gap: 16px; justify-content: center; margin-bottom: 32px;">
+                <a href="#" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Start Learning Free
+                </a>
+                <a href="#" class="btn btn-secondary">
+                    <i class="fas fa-play"></i>
+                    See How It Works
+                </a>
+            </div>
+            
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value">10K+</div>
+                    <div class="hero-stat-label">Active Learners</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">500+</div>
+                    <div class="hero-stat-label">Courses</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">95%</div>
+                    <div class="hero-stat-label">Completion Rate</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">4.8</div>
+                    <div class="hero-stat-label">App Rating</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Dashboard -->
+    <main class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Learning</div>
+                <a href="#" class="sidebar-item active">
+                    <i class="fas fa-home"></i>
+                    Home
+                </a>
+                <a href="#" class="sidebar-item">
+                    <i class="fas fa-book-open"></i>
+                    My Courses
+                    <span class="sidebar-badge">4</span>
+                </a>
+                <a href="#" class="sidebar-item">
+                    <i class="fas fa-chart-line"></i>
+                    Progress
+                </a>
+                <a href="#" class="sidebar-item">
+                    <i class="fas fa-trophy"></i>
+                    Achievements
+                    <span class="sidebar-badge">12</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Social</div>
+                <a href="#" class="sidebar-item">
+                    <i class="fas fa-users"></i>
+                    Leaderboard
+                </a>
+                <a href="#" class="sidebar-item">
+                    <i class="fas fa-user-friends"></i>
+                    Teams
+                </a>
+                <a href="#" class="sidebar-item">
+                    <i class="fas fa-comments"></i>
+                    Discussions
+                </a>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Account</div>
+                <a href="#" class="sidebar-item">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </a>
+                <a href="#" class="sidebar-item">
+                    <i class="fas fa-question-circle"></i>
+                    Help
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Progress Card -->
+            <div class="progress-card">
+                <div class="progress-header">
+                    <h3 class="progress-title">Your Progress This Week</h3>
+                    <div class="progress-streak">
+                        <i class="fas fa-fire"></i>
+                        14 days
+                    </div>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar-label">
+                        <span>Level 5 - 2,450 XP</span>
+                        <span>68% to Level 6</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 68%;"></div>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--duo-green);">23</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-500);">Lessons</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--duo-blue);">5</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-500);">Courses</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--duo-purple);">3</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-500);">Certificates</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 800; color: var(--duo-yellow);">12</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-500);">Badges</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Continue Learning -->
+            <section>
+                <div class="section-header">
+                    <h2 class="section-title">Continue Learning</h2>
+                    <a href="#" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <div class="courses-grid">
+                    <div class="course-card">
+                        <div class="course-image">
+                            <i class="fas fa-code"></i>
+                            <span class="course-badge">In Progress</span>
+                        </div>
+                        <div class="course-content">
+                            <h3 class="course-title">Python Fundamentals</h3>
+                            <p class="course-description">Master the basics of Python programming with hands-on exercises.</p>
+                            <div class="course-meta">
+                                <span><i class="fas fa-play-circle"></i> 24 lessons</span>
+                                <span><i class="fas fa-clock"></i> 2h</span>
+                            </div>
+                            <div class="course-progress">
+                                <div class="course-progress-bar">
+                                    <div class="course-progress-fill" style="width: 65%;"></div>
+                                </div>
+                                <div class="course-progress-text">65% complete</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="course-card">
+                        <div class="course-image" style="background: linear-gradient(135deg, var(--duo-blue) 0%, var(--duo-purple) 100%);">
+                            <i class="fas fa-chart-pie"></i>
+                            <span class="course-badge">In Progress</span>
+                        </div>
+                        <div class="course-content">
+                            <h3 class="course-title">Data Science Basics</h3>
+                            <p class="course-description">Learn data analysis, visualization, and machine learning fundamentals.</p>
+                            <div class="course-meta">
+                                <span><i class="fas fa-play-circle"></i> 18 lessons</span>
+                                <span><i class="fas fa-clock"></i> 3h</span>
+                            </div>
+                            <div class="course-progress">
+                                <div class="course-progress-bar">
+                                    <div class="course-progress-fill" style="width: 40%;"></div>
+                                </div>
+                                <div class="course-progress-text">40% complete</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="course-card">
+                        <div class="course-image" style="background: linear-gradient(135deg, var(--duo-pink) 0%, var(--duo-red) 100%);">
+                            <i class="fas fa-briefcase"></i>
+                            <span class="course-badge">New</span>
+                        </div>
+                        <div class="course-content">
+                            <h3 class="course-title">Business Skills</h3>
+                            <p class="course-description">Communication, leadership, and time management for professionals.</p>
+                            <div class="course-meta">
+                                <span><i class="fas fa-play-circle"></i> 15 lessons</span>
+                                <span><i class="fas fa-clock"></i> 1.5h</span>
+                            </div>
+                            <div class="course-progress">
+                                <div class="course-progress-bar">
+                                    <div class="course-progress-fill" style="width: 10%;"></div>
+                                </div>
+                                <div class="course-progress-text">Just started</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Achievements -->
+            <section>
+                <div class="section-header">
+                    <h2 class="section-title">Recent Achievements</h2>
+                    <a href="#" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <div class="achievements-grid">
+                    <div class="achievement-card earned">
+                        <div class="achievement-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>Week Warrior</h4>
+                            <p>7 day streak</p>
+                        </div>
+                        <div class="achievement-points">+50 XP</div>
+                    </div>
+                    
+                    <div class="achievement-card earned">
+                        <div class="achievement-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>Quick Learner</h4>
+                            <p>10 lessons completed</p>
+                        </div>
+                        <div class="achievement-points">+50 XP</div>
+                    </div>
+                    
+                    <div class="achievement-card earned">
+                        <div class="achievement-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>Python Master</h4>
+                            <p>Completed course</p>
+                        </div>
+                        <div class="achievement-points">+100 XP</div>
+                    </div>
+                    
+                    <div class="achievement-card">
+                        <div class="achievement-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h4>Monthly Master</h4>
+                            <p>30 day streak</p>
+                        </div>
+                        <div class="achievement-points">+200 XP</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Leaderboard -->
+            <section class="leaderboard">
+                <div class="leaderboard-header">
+                    <h3 class="leaderboard-title">Leaderboard</h3>
+                    <div class="leaderboard-tabs">
+                        <button class="leaderboard-tab active">Global</button>
+                        <button class="leaderboard-tab">Team</button>
+                        <button class="leaderboard-tab">Friends</button>
+                    </div>
+                </div>
+                
+                <div class="leaderboard-list">
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank gold">1</div>
+                        <div class="leaderboard-user">
+                            <div class="leaderboard-avatar">MR</div>
+                            <div class="leaderboard-name">Maria Rodriguez</div>
+                        </div>
+                        <div class="leaderboard-stats">
+                            <div class="leaderboard-stat">
+                                <i class="fas fa-fire"></i> 45
+                            </div>
+                            <div class="leaderboard-stat">
+                                <i class="fas fa-trophy"></i> 23
+                            </div>
+                        </div>
+                        <div class="leaderboard-points">8,450 XP</div>
+                    </div>
+                    
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank silver">2</div>
+                        <div class="leaderboard-user">
+                            <div class="leaderboard-avatar">JC</div>
+                            <div class="leaderboard-name">John Chen</div>
+                        </div>
+                        <div class="leaderboard-stats">
+                            <div class="leaderboard-stat">
+                                <i class="fas fa-fire"></i> 32
+                            </div>
+                            <div class="leaderboard-stat">
+                                <i class="fas fa-trophy"></i> 18
+                            </div>
+                        </div>
+                        <div class="leaderboard-points">7,820 XP</div>
+                    </div>
+                    
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank bronze">3</div>
+                        <div class="leaderboard-user">
+                            <div class="leaderboard-avatar">SK</div>
+                            <div class="leaderboard-name">Sarah Kim</div>
+                        </div>
+                        <div class="leaderboard-stats">
+                            <div class="leaderboard-stat">
+                                <i class="fas fa-fire"></i> 28
+                            </div>
+                            <div class="leaderboard-stat">
+                                <i class="fas fa-trophy"></i> 15
+                            </div>
+                        </div>
+                        <div class="leaderboard-points">7,150 XP</div>
+                    </div>
+                    
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank default">4</div>
+                        <div class="leaderboard-user">
+                            <div class="leaderboard-avatar" style="background: var(--duo-purple);">AS</div>
+                            <div class="leaderboard-name">You</div>
+                        </div>
+                        <div class="leaderboard-stats">
+                            <div class="leaderboard-stat">
+                                <i class="fas fa-fire"></i> 14
+                            </div>
+                            <div class="leaderboard-stat">
+                                <i class="fas fa-trophy"></i> 12
+                            </div>
+                        </div>
+                        <div class="leaderboard-points">2,450 XP</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-brand">MicroLearn Pro</div>
+        <p>© 2026 MicroLearn Pro. Learn smarter, not longer.</p>
+    </footer>
+</body>
+</html>
