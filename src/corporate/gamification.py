@@ -5,7 +5,7 @@ Badges, points, leaderboards, and engagement for corporate learning
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models import User, Course, Enrollment, Progress, Certificate, Achievement, UserAchievement
-from src import db
+from src.models import db
 from datetime import datetime, timedelta
 
 gamification_bp = Blueprint('gamification', __name__, url_prefix='/gamification')

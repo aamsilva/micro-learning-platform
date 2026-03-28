@@ -5,7 +5,7 @@ Personalized learning recommendations for corporate users
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models import User, Course, Enrollment, Progress, Lesson
-from src import db
+from src.models import db
 import random
 
 ai_bp = Blueprint('ai', __name__, url_prefix='/ai')

@@ -5,7 +5,8 @@ Simplified dashboard for employees to consume microlearning content
 from flask import Blueprint, render_template, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models import User, Course, Enrollment, Progress, Lesson, Quiz, Certificate
-from src import db
+from src.models import db as _db
+
 from datetime import datetime, timedelta
 
 corporate_bp = Blueprint('corporate', __name__, url_prefix='/corporate')

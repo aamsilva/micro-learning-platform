@@ -5,7 +5,7 @@ For HR teams to manage corporate training and compliance
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models import User, Course, Enrollment, Progress, Certificate, Review
-from src import db
+from src.models import db
 from datetime import datetime, timedelta
 from sqlalchemy import func
 
